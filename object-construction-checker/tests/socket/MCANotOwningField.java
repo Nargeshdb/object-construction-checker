@@ -5,6 +5,7 @@ import java.net.Socket;
 
 class MCANotOwningField {
 
+    // :: error: required.method.not.called
     final Socket s;
 
     MCANotOwningField(Socket s) throws Exception {

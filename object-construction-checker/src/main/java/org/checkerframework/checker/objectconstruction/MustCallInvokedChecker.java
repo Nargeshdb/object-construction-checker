@@ -43,17 +43,7 @@ import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.block.ExceptionBlock;
 import org.checkerframework.dataflow.cfg.block.SingleSuccessorBlock;
 import org.checkerframework.dataflow.cfg.block.SpecialBlockImpl;
-import org.checkerframework.dataflow.cfg.node.AssignmentNode;
-import org.checkerframework.dataflow.cfg.node.FieldAccessNode;
-import org.checkerframework.dataflow.cfg.node.LocalVariableNode;
-import org.checkerframework.dataflow.cfg.node.MethodInvocationNode;
-import org.checkerframework.dataflow.cfg.node.Node;
-import org.checkerframework.dataflow.cfg.node.NullLiteralNode;
-import org.checkerframework.dataflow.cfg.node.ObjectCreationNode;
-import org.checkerframework.dataflow.cfg.node.ReturnNode;
-import org.checkerframework.dataflow.cfg.node.TernaryExpressionNode;
-import org.checkerframework.dataflow.cfg.node.ThisNode;
-import org.checkerframework.dataflow.cfg.node.TypeCastNode;
+import org.checkerframework.dataflow.cfg.node.*;
 import org.checkerframework.dataflow.expression.FieldAccess;
 import org.checkerframework.dataflow.expression.JavaExpression;
 import org.checkerframework.dataflow.expression.LocalVariable;
@@ -246,8 +236,9 @@ class MustCallInvokedChecker {
       }
       if (!validTarget && target instanceof FieldAccess) {
         Element elt = ((FieldAccess) target).getField();
-        if (!checker.hasOption(MustCallChecker.NO_LIGHTWEIGHT_OWNERSHIP)
-            && typeFactory.getDeclAnnotation(elt, Owning.class) != null) {
+        //        if (!checker.hasOption(MustCallChecker.NO_LIGHTWEIGHT_OWNERSHIP)
+        //            && typeFactory.getDeclAnnotation(elt, Owning.class) != null) {
+        if (!checker.hasOption(MustCallChecker.NO_LIGHTWEIGHT_OWNERSHIP)) {
           // if the target is an Owning field, this satisfies case 1
           validTarget = true;
         }
@@ -555,7 +546,10 @@ class MustCallInvokedChecker {
     if (lhsElement.getKind().equals(ElementKind.FIELD)) {
       boolean isOwningField =
           !checker.hasOption(MustCallChecker.NO_LIGHTWEIGHT_OWNERSHIP)
-              && typeFactory.getDeclAnnotation(lhsElement, Owning.class) != null;
+              && typeFactory.hasMustCall(lhs.getTree());
+      //      boolean isOwningField =
+      //          !checker.hasOption(MustCallChecker.NO_LIGHTWEIGHT_OWNERSHIP)
+      //              && typeFactory.getDeclAnnotation(lhsElement, Owning.class) != null;
       // Check that there is no obligation on the lhs, if the field is non-final and owning.
       if (isOwningField
           && typeFactory.useAccumulationFrames()
@@ -686,11 +680,12 @@ class MustCallInvokedChecker {
     Node lhsNode = node.getTarget();
 
     if (!(lhsNode instanceof FieldAccessNode)) {
-      throw new BugInCF(
-          "tried to check reassignment to a field for a non-field node: "
-              + node
-              + " of type: "
-              + node.getClass());
+      return;
+      //      throw new BugInCF(
+      //          "tried to check reassignment to a field for a non-field node: "
+      //              + node
+      //              + " of type: "
+      //              + node.getClass());
     }
 
     FieldAccessNode lhs = (FieldAccessNode) lhsNode;
@@ -835,8 +830,12 @@ class MustCallInvokedChecker {
 
       return ((LocalVariableNode) receiver).getName();
     }
-    throw new BugInCF(
-        "unexpected receiver of field assignment: " + receiver + " of type " + receiver.getClass());
+
+    return receiver.toString();
+    // throws a bug when class is final
+    //    throw new BugInCF(
+    //        "unexpected receiver of field assignment: " + receiver + " of type " +
+    // receiver.getClass());
   }
 
   /**

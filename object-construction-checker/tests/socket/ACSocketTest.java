@@ -174,7 +174,9 @@ public class ACSocketTest
         }
     }
 
+    // :: error: required.method.not.called
     protected Socket sock;
+    @CreatesObligation
     void connectToLeader(AtomicReference<Socket> socket) throws IOException {
         // :: error: required.method.not.called
         if (socket.get() == null) {
@@ -407,9 +409,12 @@ public class ACSocketTest
         return configureSSLServerSocket(sslServerSocket);
     }
 
+    // :: error: required.method.not.called
     private SSLServerSocket nonOwningSSField;
 
+    @CreatesObligation
     void assignToNonOwningViaCast(SSLContext sslContext) throws IOException {
+        // :: error: required.method.not.called
         nonOwningSSField = (SSLServerSocket) sslContext.getServerSocketFactory().createServerSocket();
     }
 

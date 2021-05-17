@@ -25,11 +25,11 @@ class CheckFields {
         private final Foo finalNotOwningFoo;
         private @Owning Foo owningFoo;
         private @Owning @MustCall({}) Foo owningEmptyMustCallFoo;
+        // :: error: required.method.not.called
         private Foo notOwningFoo;
         public FooField() {
             this.finalOwningFoo = new Foo();
             this.finalOwningFooWrong = new Foo();
-            // :: error: required.method.not.called
             this.finalNotOwningFoo = new Foo();
         }
 
@@ -55,9 +55,10 @@ class CheckFields {
             }
         }
 
+        @CreatesObligation
         void assingToFinalNotOwningField() {
-            // :: error: required.method.not.called
             Foo f = new Foo();
+            // :: error: required.method.not.called
             this.notOwningFoo = f;
         }
 
@@ -65,11 +66,13 @@ class CheckFields {
             return this.owningFoo;
         }
 
-        @EnsuresCalledMethods(value = {"this.finalOwningFoo", "this.owningFoo"}, methods = {"a"})
+        @SuppressWarnings("contracts.postcondition.not.satisfied")
+        @EnsuresCalledMethods(value = {"this.finalOwningFoo", "this.owningFoo", "this.finalNotOwningFoo"}, methods = {"a"})
         void b() {
             this.finalOwningFoo.a();
             this.finalOwningFoo.c();
             this.owningFoo.a();
+            this.finalNotOwningFoo.a();
         }
     }
 

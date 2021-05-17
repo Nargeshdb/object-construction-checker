@@ -69,16 +69,20 @@ class ACMethodInvocationTest {
         return makeFoo();
     }
 
+    // :: error: required.method.not.called
     Foo testField1;
+    // :: error: required.method.not.called
     Foo testField2;
+    // :: error: required.method.not.called
     Foo testField3;
 
+    @CreatesObligation
     void testStoringInField() {
         // :: error: required.method.not.called
         testField1 = makeFoo();
         // :: error: required.method.not.called
         testField2 = new Foo();
-
+        // :: error: required.method.not.called
         testField3 = makeFooFinalize();
     }
 

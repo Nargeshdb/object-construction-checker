@@ -19,7 +19,6 @@ import org.checkerframework.checker.mustcall.MustCallChecker;
 import org.checkerframework.checker.mustcall.qual.CreatesObligation;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.objectconstruction.qual.EnsuresCalledMethodsVarArgs;
-import org.checkerframework.checker.objectconstruction.qual.Owning;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.source.DiagMessage;
 import org.checkerframework.javacutil.AnnotationUtils;
@@ -156,9 +155,12 @@ public class ObjectConstructionVisitor extends CalledMethodsVisitor {
   public Void visitVariable(VariableTree node, Void p) {
     Element varElement = TreeUtils.elementFromTree(node);
 
+    //    if (varElement.getKind().isField()
+    //        && !checker.hasOption(MustCallChecker.NO_LIGHTWEIGHT_OWNERSHIP)
+    //        && atypeFactory.getDeclAnnotation(varElement, Owning.class) != null) {
     if (varElement.getKind().isField()
         && !checker.hasOption(MustCallChecker.NO_LIGHTWEIGHT_OWNERSHIP)
-        && atypeFactory.getDeclAnnotation(varElement, Owning.class) != null) {
+        && atypeFactory.hasMustCall(node)) {
       checkOwningField(varElement);
     }
 

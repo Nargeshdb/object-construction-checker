@@ -9,9 +9,9 @@ import java.io.*;
 
 public class MustCallAliasImplWrong2 implements Closeable {
 
+    // :: error: required.method.not.called
     final /*@Owning*/ Closeable foo;
 
-    // :: error: required.method.not.called
     public @MustCallAlias MustCallAliasImplWrong2(@MustCallAlias Closeable foo) {
         this.foo = foo;
     }
